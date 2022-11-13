@@ -1,0 +1,45 @@
+first pico_w				2nd pico_w
+pi4-27						pi4-34 or pi4-36
+Modify pico-examples/pico_w/tcp_client/picow-tcp-client.c
+
+pi4-27
+#define TCP_PORT 4242
++#define TCP_PORT 5252
+devel@pi4-27:~/pico-ex
+amples/build $ cmake -DPICO_BOARD=pico_w  -DTEST_TCP_SERVER_IP="192.168.1.160" ..
+make
+pi4-36
+devel@pi4-36:~/pico-examples/build $ cmake -DPICO_BOARD=pico_w  -DTEST_TCP_SERVER_IP="192.168.1.159" ..
+
+This serves adding a new tcp_server-1 on the dev branch of pico-examples
+The line below needs to be added in pico-examples/pico_w/CMakeLists.txt
+add_subdirectory(tcp_server)
+
+The folder needs to added pico-examples/pico_w/
+
+a file pw_ssid.h needed to be added.
+
+git clone git@github.com:develone/pico-examples.git -b dev
+Cloning into 'pico-examples'...
+fatal: Remote branch dev not found in upstream origin
+devel@pi4-27:~/xx $ git clone git@github.com:develone/pico-examples.git 
+Cloning into 'pico-examples'...
+remote: Enumerating objects: 2065, done.
+remote: Counting objects: 100% (825/825), done.
+remote: Compressing objects: 100% (298/298), done.
+remote: Total 2065 (delta 639), reused 527 (delta 527), pack-reused 1240
+Receiving objects: 100% (2065/2065), 7.38 MiB | 1.12 MiB/s, done.
+Resolving deltas: 100% (1107/1107), done.
+
+cd pico-examples
+
+git checkout -b dev
+
+add the new folder or files
+
+git commit -a
+
+git commit origin/dev
+
+git push
+
