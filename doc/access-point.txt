@@ -1,0 +1,43 @@
+nmap   10.0.1.0/24
+Starting Nmap 7.80 ( https://nmap.org ) at 2022-11-13 05:49 MST
+Nmap scan report for 10.0.1.16
+Host is up (0.042s latency).
+Not shown: 965 closed ports, 34 filtered ports
+PORT     STATE SERVICE
+5001/tcp open  commplex-link
+
+Nmap scan report for 10.0.1.17
+Host is up (0.00048s latency).
+Not shown: 995 closed ports
+PORT     STATE SERVICE
+22/tcp   open  ssh
+111/tcp  open  rpcbind
+139/tcp  open  netbios-ssn
+445/tcp  open  microsoft-ds
+2049/tcp open  nfs
+
+Nmap scan report for 10.0.1.18
+Host is up (0.052s latency).
+Not shown: 999 closed ports
+PORT     STATE SERVICE
+5001/tcp open  commplex-link
+
+Nmap scan report for 10.0.1.19
+Host is up (0.045s latency).
+Not shown: 999 closed ports
+PORT     STATE SERVICE
+5001/tcp open  commplex-link
+
+Nmap scan report for 10.0.1.20
+Host is up (0.049s latency).
+Not shown: 999 closed ports
+PORT     STATE SERVICE
+5001/tcp open  commplex-link
+
+Nmap scan report for 10.0.1.21
+Host is up (0.021s latency).
+Not shown: 999 closed ports
+PORT     STATE SERVICE
+5001/tcp open  commplex-link
+
+Nmap done: 256 IP addresses (6 hosts up) scanned in 15.12 seconds

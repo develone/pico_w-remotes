@@ -1,0 +1,37 @@
+./run-iperf.sh 
+------------------------------------------------------------
+Client connecting to 10.0.1.16, TCP port 5001
+TCP window size: 43.8 KByte (default)
+------------------------------------------------------------
+[  3] local 10.0.1.17 port 51554 connected with 10.0.1.16 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3] 0.0000-10.0580 sec  11.8 MBytes  9.80 Mbits/sec
+------------------------------------------------------------
+Client connecting to 10.0.1.18, TCP port 5001
+TCP window size: 43.8 KByte (default)
+------------------------------------------------------------
+[  3] local 10.0.1.17 port 44432 connected with 10.0.1.18 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3] 0.0000-10.0327 sec  12.0 MBytes  10.0 Mbits/sec
+------------------------------------------------------------
+Client connecting to 10.0.1.19, TCP port 5001
+TCP window size: 43.8 KByte (default)
+------------------------------------------------------------
+[  3] local 10.0.1.17 port 55472 connected with 10.0.1.19 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3] 0.0000-10.0148 sec  10.8 MBytes  9.00 Mbits/sec
+------------------------------------------------------------
+Client connecting to 10.0.1.20, TCP port 5001
+TCP window size: 43.8 KByte (default)
+------------------------------------------------------------
+[  3] local 10.0.1.17 port 49162 connected with 10.0.1.20 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3] 0.0000-10.2037 sec  8.50 MBytes  6.99 Mbits/sec
+------------------------------------------------------------
+Client connecting to 10.0.1.21, TCP port 5001
+TCP window size: 43.8 KByte (default)
+------------------------------------------------------------
+[  3] local 10.0.1.17 port 43550 connected with 10.0.1.21 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3] 0.0000-10.0303 sec  10.1 MBytes  8.47 Mbits/sec
+
