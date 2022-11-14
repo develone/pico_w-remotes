@@ -1,0 +1,43 @@
+./doc/find-mac.sh 
+PING remote1 (10.0.1.16) 56(84) bytes of data.
+64 bytes from remote1 (10.0.1.16): icmp_seq=1 ttl=255 time=4363 ms
+64 bytes from remote1 (10.0.1.16): icmp_seq=2 ttl=255 time=3337 ms
+
+--- remote1 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1026ms
+rtt min/avg/max/mdev = 3336.616/3849.648/4362.680/513.032 ms, pipe 2
+PING remote2 (10.0.1.18) 56(84) bytes of data.
+64 bytes from remote2 (10.0.1.18): icmp_seq=1 ttl=255 time=275 ms
+64 bytes from remote2 (10.0.1.18): icmp_seq=2 ttl=255 time=113 ms
+
+--- remote2 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+rtt min/avg/max/mdev = 113.308/194.313/275.319/81.005 ms
+PING remote3 (10.0.1.19) 56(84) bytes of data.
+64 bytes from remote3 (10.0.1.19): icmp_seq=1 ttl=64 time=0.108 ms
+64 bytes from remote3 (10.0.1.19): icmp_seq=2 ttl=64 time=0.091 ms
+
+--- remote3 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 0.091/0.099/0.108/0.008 ms
+PING remote4 (10.0.1.20) 56(84) bytes of data.
+64 bytes from remote4 (10.0.1.20): icmp_seq=1 ttl=255 time=159 ms
+64 bytes from remote4 (10.0.1.20): icmp_seq=2 ttl=255 time=180 ms
+
+--- remote4 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 159.175/169.562/179.949/10.387 ms
+PING remote5 (10.0.1.21) 56(84) bytes of data.
+From remote3 (10.0.1.19) icmp_seq=1 Destination Host Unreachable
+From remote3 (10.0.1.19) icmp_seq=2 Destination Host Unreachable
+
+--- remote5 ping statistics ---
+2 packets transmitted, 0 received, +2 errors, 100% packet loss, time 1008ms
+pipe 2
+remote2 (10.0.1.18) at 28:cd:c1:01:35:6a [ether] on wlan0
+remote1 (10.0.1.16) at 28:cd:c1:08:17:22 [ether] on wlan0
+pi4-27.attlocal.net (192.168.1.229) at e4:5f:01:1a:8a:d8 [ether] on eth0
+dsldevice.attlocal.net (192.168.1.254) at cc:ab:2c:c7:5e:51 [ether] on eth0
+remote5 (10.0.1.21) at <incomplete> on wlan0
+remote4 (10.0.1.20) at 28:cd:c1:01:35:6e [ether] on wlan0
+EPSON663615.attlocal.net (192.168.1.87) at 64:eb:8c:66:36:15 [ether] on eth0
