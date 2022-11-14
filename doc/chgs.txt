@@ -1,0 +1,13 @@
+access_point/picow_access_point.c:    const char *ap_name = "nanotest";
+freertos/iperf/picow_freertos_iperf.c:    if (cyw43_arch_wifi_connect_timeout_ms("nanotest", "12345678", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
+freertos/ping/picow_freertos_ping.c:    if (cyw43_arch_wifi_connect_timeout_ms("nanotest", "12345678", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
+iperf/picow_iperf.c:    if (cyw43_arch_wifi_connect_timeout_ms("nanotest", "12345678", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
+ntp_client/picow_ntp_client.c:    if (cyw43_arch_wifi_connect_timeout_ms("nanotest", "12345678", CYW43_AUTH_WPA2_AES_PSK, 10000)) {
+tcp_client/picow_tcp_client.c:    if (cyw43_arch_wifi_connect_timeout_ms("nanotest", "12345678", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
+access_point/picow_access_point.c:    const char *password = "12345678";
+freertos/iperf/picow_freertos_iperf.c:    if (cyw43_arch_wifi_connect_timeout_ms("nanotest", "12345678", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
+freertos/ping/picow_freertos_ping.c:    if (cyw43_arch_wifi_connect_timeout_ms("nanotest", "12345678", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
+iperf/picow_iperf.c:    if (cyw43_arch_wifi_connect_timeout_ms("nanotest", "12345678", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
+ntp_client/picow_ntp_client.c:    if (cyw43_arch_wifi_connect_timeout_ms("nanotest", "12345678", CYW43_AUTH_WPA2_AES_PSK, 10000)) {
+tcp_client/picow_tcp_client.c:    if (cyw43_arch_wifi_connect_timeout_ms("nanotest", "12345678", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
+tcp_server/picow_tcp_server.c:    if (cyw43_arch_wifi_connect_timeout_ms("nanotes", "12345678", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
