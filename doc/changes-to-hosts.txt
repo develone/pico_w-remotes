@@ -1,0 +1,8 @@
+When the remotes are programmed they are assigned an IP
+by the dhcp server.  You need to add to /etc/hosts
+
+10.0.1.16       remote1
+10.0.1.18       remote2
+10.0.1.19       remote3
+10.0.1.20       remote4
+10.0.1.21       remote5
