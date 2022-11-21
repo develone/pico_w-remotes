@@ -1,5 +1,6 @@
 add_executable(picow_freertos_iperf_server_nosys
         picow_freertos_iperf.c
+		mqtt.c
 		crc.h
 		crc16.h
 		lifting.h
