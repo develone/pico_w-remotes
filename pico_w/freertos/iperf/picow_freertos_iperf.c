@@ -40,6 +40,7 @@ gpio will be an additional freertos task
 #define TEST_TASK_PRIORITY				( tskIDLE_PRIORITY + 2UL )
 #define BLINK_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
 #define GPIO_TASK_PRIORITY				( tskIDLE_PRIORITY + 3UL )
+#define MQTT_TASK_PRIORITY				( tskIDLE_PRIORITY + 4UL )
 #if CLIENT_TEST && !defined(IPERF_SERVER_IP)
 #error IPERF_SERVER_IP not defined
 #endif
