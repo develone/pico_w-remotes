@@ -1,0 +1,117 @@
+Posted on Twitter.
+Has anyone used mqtt.c from pico-sdk lwip lib?
+error: expected expression before 'void'
+     a_mqtt_client = mqtt_client_new(void);error: too many arguments to function 'mqtt_client_new'
+     a_mqtt_client = mqtt_client_new(void);
+ This was fix 
+	/*The line was failing */
+    //a_mqtt_client = mqtt_client_new(void);
+	/*The next 2 lines were what was being done by failing code */
+	LWIP_ASSERT_CORE_LOCKED();
+	a_mqtt_client_t = (mqtt_client_t *)mem_calloc(1, sizeof(mqtt_client_t));
+	printf("sizeof(mqtt_client_t) 0x%x %d \n",sizeof(mqtt_client_t),sizeof(mqtt_client_t));
+lines 1255-1265	https://github.com/develone/pico_w-remotes/blob/master/pico_w/freertos/iperf/mqtt.c
+/**
+ * @ingroup mqtt
+ * Create a new MQTT client instance
+ * @return Pointer to instance on success, NULL otherwise
+ */
+mqtt_client_t *
+mqtt_client_new(void)
+{
+  LWIP_ASSERT_CORE_LOCKED();
+  return (mqtt_client_t *)mem_calloc(1, sizeof(mqtt_client_t));
+}
+	
+cd pico_w-remotes
+
+Requires: git clone https://github.com/develone/FreeRTOS-Kernel.git 
+or git clone git@github.com:develone/FreeRTOS-Kernel.git
+git clone https://github.com/develone/pico-sdk.git or git clone git@github.com:develone/pico-sdk.git
+
+Without any modification this repo will create an access-point and 5 remotes.
+
+./5remotes.sh will create 5 remotes in about 22 mins.
+The pico_w is programmed with
+/home/devel/pico_w-remotes/remote5/pico_w/freertos/iperf/picow_freertos_iperf_server_nosys.uf2
+
+WIFI_SSID="nanotest" WIFI_PASSWORD="12345678"
+For you local network modify these files.
+
+5remotes.sh
+pico_w/freertos/iperf/pw_ssid.h
+pico_w/freertos/ping/picow_freertos_ping.c
+pico_w/freertos/ping/pw_ssid.h
+pico_w/iperf/picow_iperf.c
+pico_w/iperf/pw_ssid.h
+pico_w/ntp_client/picow_ntp_client.c
+pico_w/ntp_client/pw_ssid.h
+pico_w/tcp_client/picow_tcp_client.c
+pico_w/tcp_client/pw_ssid.h
+pico_w/tcp_server/picow_tcp_server.c
+pico_w/tcp_server/pw_ssid.h
+      
+minicom myusb0
+
+Welcome to minicom 2.8
+
+OPTIONS: I18n 
+Port /dev/ttyUSB0, 21:03:49
+
+Press CTRL-A Z for help on special keys
+
+adding gpio support to the program
+Back from buildCRCTable 
+0xd3 0x1 0x2e 
+Starting FreeRTOS on core 0:
+Connecting to WiFi...
+Connected.
+gpio_task starts
+mqtt_task starts
+CID1863 testuser
+password123 10
+update/memo 
+mqtt_connect_client_info_t 0x10017360 
+MQTT_SERVER 192.168.1.229 mqtt_port 9863 
+a_mqtt_client_t 0x0  *a_mqtt_client_t 0x20041f00 
+sizeof(mqtt_client_t) 0x1f0 496 
+a_mqtt_client_t 0x20021f3c  *a_mqtt_client_t 0x0                                
+                                                                                
+Ready, running iperf server at 192.168.1.159                                    
+blink_task starts
+
+The following script set the PATH.
+
+. Ultibo_Projects/picoultibo.sh 
+/home/devel/ultibo/core:/home/devel/qemu-6.2.0-rpios/bin:/home/devel/local/openocd/bin:/home/devel/picotool/build/:/home/devel/.pyenv/plugins/pyenv-virtualenv/shims:/home/devel/.pyenv/shims:/home/devel/.pyenv/bin:/home/devel/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/games:/usr/games
+
+cd Ultibo_Projects/Pauls-ultibo-mqtt/QEMU/
+
+
+#!/bin/bash
+qemu-system-arm -machine versatilepb -cpu cortex-a8 -kernel kernel.bin \
+-net user,hostfwd=tcp::5080-:80,hostfwd=tcp::5023-:23,hostfwd=tcp::9883-:1883,hostfwd=udp::5069-:69,hostfwd=tcp::6050-:5050 -net nic \
+ -drive file=disk.img,if=sd,format=raw
+
+./startqemu.sh  brings up the following window.
+
+const ip_addr_t *ip_addr;
+char MQTT_SERVER[] = "192.168.1.229";
+u16_t mqtt_port 9863;
+
+/**
+ * @ingroup mqtt
+ * Connect to MQTT server
+ * @param client MQTT client
+ * @param ip_addr Server IP
+ * @param port Server port
+ * @param cb Connection state change callback
+ * @param arg User supplied argument to connection callback
+ * @param client_info Client identification and connection options
+ * @return ERR_OK if successful, @see err_t enum for other results
+ */
+mqtt_client_connect(mqtt_client_t *client, const ip_addr_t *ip_addr, u16_t port, mqtt_connection_cb_t cb, void *arg,
+                    const struct mqtt_connect_client_info_t *client_info)
+
+11/23/22 The pico_w is programmed with 
+git clone https://github.com/develone/pico_w-remotes.git
