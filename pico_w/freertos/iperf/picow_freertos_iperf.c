@@ -24,7 +24,9 @@ gpio will be an additional freertos task
 #include "klt.h"
 #include "xtransmit.h"
 #include "xreceive.h"
-
+#include "lwip/apps/mqtt.h"
+#include "lwip/apps/mqtt_opts.h"
+#include "lwip/apps/mqtt_priv.h"
 /*needed for GPIO from pico-examples/gpio/hello_7segment/hello_7segment.c
 gpio will be an additional freertos task
 */
@@ -42,6 +44,10 @@ gpio will be an additional freertos task
 #error IPERF_SERVER_IP not defined
 #endif
 
+char MQTT_SERVER[] = "192.168.1.229";
+u16_t mqtt_port = 9863;
+struct mqtt_client_s *a_mqtt_client_s;
+struct mqtt_client_s *a_mqtt_client_t;
 // This array converts a number 0-9 to a bit pattern to send to the GPIOs
 int bits[10] = {
         0x3f,  // 0
@@ -85,17 +91,27 @@ void blink_task(__unused void *params) {
         on = !on;
         vTaskDelay(200);
     }
-}
+} 
 
 void gpio_task(__unused void *params) {
     //bool on = false;
     printf("gpio_task starts\n");
+	printf("MQTT_SERVER %s mqtt_port %d \n",MQTT_SERVER,mqtt_port);
+ 	printf("a_mqtt_client_t 0x%x  *a_mqtt_client_t 0x%x \n", a_mqtt_client_t, *a_mqtt_client_t);
+	
+	/*The line was failing */
+    //a_mqtt_client = mqtt_client_new(void);
+	/*The next 2 lines were what was being done by failing code */
+	LWIP_ASSERT_CORE_LOCKED();
+	a_mqtt_client_t = (mqtt_client_t *)mem_calloc(1, sizeof(mqtt_client_t));
+	printf("sizeof(mqtt_client_t) 0x%x %d \n",sizeof(mqtt_client_t),sizeof(mqtt_client_t));
+	printf("a_mqtt_client_t 0x%x  *a_mqtt_client_t 0x%x \n", a_mqtt_client_t, *a_mqtt_client_t);
     while (true) {
 #if 0 && configNUM_CORES > 1
         static int last_core_id;
         if (portGET_CORE_ID() != last_core_id) {
             last_core_id = portGET_CORE_ID();
-            printf("blinking now from core %d\n", last_core_id);
+            printf("gpio now from core %d\n", last_core_id);
         }
 #endif
         //cyw43_arch_gpio_put(0, on);
@@ -149,6 +165,7 @@ void gpio_task(__unused void *params) {
 }
 
 void main_task(__unused void *params) {
+
     if (cyw43_arch_init()) {
         printf("failed to initialise\n");
         return;
@@ -209,6 +226,9 @@ int main( void )
 	printf("0x%x 0x%x 0x%x \n",message[0],message[1],message[2]);
     /* Configure the hardware ready to run the demo. */
     const char *rtos_name;
+
+    
+    
 #if ( portSUPPORT_SMP == 1 )
     rtos_name = "FreeRTOS SMP";
 #else
