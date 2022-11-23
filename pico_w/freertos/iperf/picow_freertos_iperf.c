@@ -104,14 +104,32 @@ void mqtt_task(__unused void *params) {
 	client_info_t.client_user="testuser";
 	client_info_t.client_pass="password123";
 	client_info_t.keep_alive = 10;
+	client_info_t.will_topic = "update/memo";
 	printf("%s %s\n",client_info_t.client_id,client_info_t.client_user);
 	printf("%s %d\n",client_info_t.client_pass,client_info_t.keep_alive);
+	printf("%s \n",client_info_t.will_topic);
 
 	printf("MQTT_SERVER %s mqtt_port %d \n",MQTT_SERVER,mqtt_port);
  	printf("a_mqtt_client_t 0x%x  *a_mqtt_client_t 0x%x \n", a_mqtt_client_t, *a_mqtt_client_t);
+	
+	/**
+ 	* @ingroup mqtt
+	* Connect to MQTT server
+	* @param client MQTT client
+ 	* @param ip_addr Server IP
+ 	* @param port Server port
+ 	* @param cb Connection state change callback
+ 	* @param arg User supplied argument to connection callback
+ 	* @param client_info Client identification and connection options
+ 	* @return ERR_OK if successful, @see err_t enum for other results
+ 
+err_t
+mqtt_client_connect(mqtt_client_t *client, const ip_addr_t *ip_addr, u16_t port, mqtt_connection_cb_t cb, void *arg,
+                    const struct mqtt_connect_client_info_t *client_info)
+	*/
 	/*
-	err_t mqtt_client_connect(mqtt_client_t *client, const ip_addr_t *ipaddr, u16_t port, mqtt_connection_cb_t cb, void *arg,
-                   const struct mqtt_connect_client_info_t *client_info);
+	err_t = mqtt_client_connect(*a_mqtt_client_t, MQTT_SERVER, mqtt_port, mqtt_connection_cb_t cb, void *arg,
+                   client_info_t);
     */
 	
 	/*The line was failing */
