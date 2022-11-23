@@ -96,7 +96,7 @@ void mqtt_task(__unused void *params) {
     printf("mqtt_task starts\n");
 	char MQTT_SERVER[] = "192.168.1.229";
 	u16_t mqtt_port = 9863;
-	struct mqtt_client_s *a_mqtt_client_s;
+	//struct mqtt_client_s *a_mqtt_client_s;
 	struct mqtt_client_s *a_mqtt_client_t;
 	struct mqtt_connect_client_info_t client_info_t;
 
@@ -108,7 +108,7 @@ void mqtt_task(__unused void *params) {
 	printf("%s %s\n",client_info_t.client_id,client_info_t.client_user);
 	printf("%s %d\n",client_info_t.client_pass,client_info_t.keep_alive);
 	printf("%s \n",client_info_t.will_topic);
-
+	printf("mqtt_connect_client_info_t 0x%0x \n",client_info_t);
 	printf("MQTT_SERVER %s mqtt_port %d \n",MQTT_SERVER,mqtt_port);
  	printf("a_mqtt_client_t 0x%x  *a_mqtt_client_t 0x%x \n", a_mqtt_client_t, *a_mqtt_client_t);
 	
@@ -127,10 +127,9 @@ err_t
 mqtt_client_connect(mqtt_client_t *client, const ip_addr_t *ip_addr, u16_t port, mqtt_connection_cb_t cb, void *arg,
                     const struct mqtt_connect_client_info_t *client_info)
 	*/
-	/*
-	err_t = mqtt_client_connect(*a_mqtt_client_t, MQTT_SERVER, mqtt_port, mqtt_connection_cb_t cb, void *arg,
-                   client_info_t);
-    */
+	
+	//err_t = mqtt_client_connect(a_mqtt_client_t, MQTT_SERVER, mqtt_port,  cb, client_info_t);
+    
 	
 	/*The line was failing */
     //a_mqtt_client = mqtt_client_new(void);
