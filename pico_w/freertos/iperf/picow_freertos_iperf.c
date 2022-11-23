@@ -45,10 +45,7 @@ gpio will be an additional freertos task
 #error IPERF_SERVER_IP not defined
 #endif
 
-char MQTT_SERVER[] = "192.168.1.229";
-u16_t mqtt_port = 9863;
-struct mqtt_client_s *a_mqtt_client_s;
-struct mqtt_client_s *a_mqtt_client_t;
+
 // This array converts a number 0-9 to a bit pattern to send to the GPIOs
 int bits[10] = {
         0x3f,  // 0
@@ -97,8 +94,25 @@ void blink_task(__unused void *params) {
 void mqtt_task(__unused void *params) {
     //bool on = false;
     printf("mqtt_task starts\n");
+	char MQTT_SERVER[] = "192.168.1.229";
+	u16_t mqtt_port = 9863;
+	struct mqtt_client_s *a_mqtt_client_s;
+	struct mqtt_client_s *a_mqtt_client_t;
+	struct mqtt_connect_client_info_t client_info_t;
+
+	client_info_t.client_id="CID1863";
+	client_info_t.client_user="testuser";
+	client_info_t.client_pass="password123";
+	client_info_t.keep_alive = 10;
+	printf("%s %s\n",client_info_t.client_id,client_info_t.client_user);
+	printf("%s %d\n",client_info_t.client_pass,client_info_t.keep_alive);
+
 	printf("MQTT_SERVER %s mqtt_port %d \n",MQTT_SERVER,mqtt_port);
  	printf("a_mqtt_client_t 0x%x  *a_mqtt_client_t 0x%x \n", a_mqtt_client_t, *a_mqtt_client_t);
+	/*
+	err_t mqtt_client_connect(mqtt_client_t *client, const ip_addr_t *ipaddr, u16_t port, mqtt_connection_cb_t cb, void *arg,
+                   const struct mqtt_connect_client_info_t *client_info);
+    */
 	
 	/*The line was failing */
     //a_mqtt_client = mqtt_client_new(void);
