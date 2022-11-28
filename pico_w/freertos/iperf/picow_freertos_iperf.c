@@ -25,8 +25,30 @@ gpio will be an additional freertos task
 #include "xtransmit.h"
 #include "xreceive.h"
 #include "lwip/apps/mqtt.h"
-#include "lwip/apps/mqtt_opts.h"
-#include "lwip/apps/mqtt_priv.h"
+#include "mqtt_example.h"
+
+u16_t mqtt_port = 9883;
+//u16_t mqtt_port = 1883;
+
+#if LWIP_TCP
+
+/** Define this to a compile-time IP address initialization
+ * to connect anything else than IPv4 loopback
+ */
+#ifndef LWIP_MQTT_EXAMPLE_IPADDR_INIT
+#if LWIP_IPV4
+
+/*192.168.1.229 0xc0a801e5 LWIP_MQTT_EXAMPLE_IPADDR_INIT */
+#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a801e5))
+//#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xe501a8c0))
+/*192.168.1.211 0xc0a801d3 LWIP_MQTT_EXAMPLE_IPADDR_INIT */
+//#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a801d3))
+//#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(IPADDR_LOOPBACK))
+#else
+#define LWIP_MQTT_EXAMPLE_IPADDR_INIT
+#endif
+#endif
+
 /*needed for GPIO from pico-examples/gpio/hello_7segment/hello_7segment.c
 gpio will be an additional freertos task
 */
@@ -74,6 +96,96 @@ static void iperf_report(void *arg, enum lwiperf_report_type report_type,
     printf("Total iperf megabytes since start %d Mbytes\n", total_iperf_megabytes);
 }
 
+static ip_addr_t mqtt_ip LWIP_MQTT_EXAMPLE_IPADDR_INIT;
+static mqtt_client_t* mqtt_client;
+
+static const struct mqtt_connect_client_info_t mqtt_client_info =
+{
+  "pico_w",
+  "testuser", /* user */
+  "password123", /* pass */
+  100,  /* keep alive */
+  "update/memo", /* will_topic */
+  NULL, /* will_msg */
+  0,    /* will_qos */
+  0     /* will_retain */
+#if LWIP_ALTCP && LWIP_ALTCP_TLS
+  , NULL
+#endif
+};
+
+static void
+mqtt_incoming_data_cb(void *arg, const u8_t *data, u16_t len, u8_t flags)
+{
+  const struct mqtt_connect_client_info_t* client_info = (const struct mqtt_connect_client_info_t*)arg;
+  LWIP_UNUSED_ARG(data);
+
+  LWIP_PLATFORM_DIAG(("MQTT client \"%s\" data cb: len %d, flags %d\n", client_info->client_id,
+          (int)len, (int)flags));
+}
+
+static void
+mqtt_incoming_publish_cb(void *arg, const char *topic, u32_t tot_len)
+{
+  const struct mqtt_connect_client_info_t* client_info = (const struct mqtt_connect_client_info_t*)arg;
+
+  LWIP_PLATFORM_DIAG(("MQTT client \"%s\" publish cb: topic %s, len %d\n", client_info->client_id,
+          topic, (int)tot_len));
+}
+
+static void
+mqtt_request_cb(void *arg, err_t err)
+{
+  const struct mqtt_connect_client_info_t* client_info = (const struct mqtt_connect_client_info_t*)arg;
+
+  LWIP_PLATFORM_DIAG(("MQTT client \"%s\" request cb: err %d\n", client_info->client_id, (int)err));
+}
+
+static void
+mqtt_connection_cb(mqtt_client_t *client, void *arg, mqtt_connection_status_t status)
+{
+  const struct mqtt_connect_client_info_t* client_info = (const struct mqtt_connect_client_info_t*)arg;
+  LWIP_UNUSED_ARG(client);
+
+  LWIP_PLATFORM_DIAG(("MQTT client \"%s\" connection cb: status %d\n", client_info->client_id, (int)status));
+
+  if (status == MQTT_CONNECT_ACCEPTED) {
+    mqtt_sub_unsub(client,
+            "topic_qos1", 1,
+            mqtt_request_cb, LWIP_CONST_CAST(void*, client_info),
+            1);
+    mqtt_sub_unsub(client,
+            "topic_qos0", 0,
+            mqtt_request_cb, LWIP_CONST_CAST(void*, client_info),
+            1);
+  }
+}
+#endif /* LWIP_TCP */
+
+void
+mqtt_example_init(void)
+{
+#if LWIP_TCP
+  mqtt_client = mqtt_client_new();
+  printf("mqtt_client 0x%x &mqtt_client 0x%x \n", mqtt_client,&mqtt_client);	
+  
+  mqtt_set_inpub_callback(mqtt_client,
+          mqtt_incoming_publish_cb,
+          mqtt_incoming_data_cb,
+          LWIP_CONST_CAST(void*, &mqtt_client_info));
+  printf("mqtt_set_inpub_callback 0x%x\n",mqtt_set_inpub_callback);
+  
+  
+  mqtt_client_connect(mqtt_client,
+          &mqtt_ip, mqtt_port,
+          mqtt_connection_cb, LWIP_CONST_CAST(void*, &mqtt_client_info),
+          &mqtt_client_info);
+  printf("mqtt_client_connect 0x%x\n",mqtt_client_connect);
+          
+#endif /* LWIP_TCP */
+}
+
+
 void blink_task(__unused void *params) {
     bool on = false;
     printf("blink_task starts\n");
@@ -94,50 +206,6 @@ void blink_task(__unused void *params) {
 void mqtt_task(__unused void *params) {
     //bool on = false;
     printf("mqtt_task starts\n");
-	char MQTT_SERVER[] = "192.168.1.229";
-	u16_t mqtt_port = 9863;
-	//struct mqtt_client_s *a_mqtt_client_s;
-	struct mqtt_client_s *a_mqtt_client_t;
-	struct mqtt_connect_client_info_t client_info_t;
-
-	client_info_t.client_id="CID1863";
-	client_info_t.client_user="testuser";
-	client_info_t.client_pass="password123";
-	client_info_t.keep_alive = 10;
-	client_info_t.will_topic = "update/memo";
-	printf("%s %s\n",client_info_t.client_id,client_info_t.client_user);
-	printf("%s %d\n",client_info_t.client_pass,client_info_t.keep_alive);
-	printf("%s \n",client_info_t.will_topic);
-	printf("mqtt_connect_client_info_t 0x%0x \n",client_info_t);
-	printf("MQTT_SERVER %s mqtt_port %d \n",MQTT_SERVER,mqtt_port);
- 	printf("a_mqtt_client_t 0x%x  *a_mqtt_client_t 0x%x \n", a_mqtt_client_t, *a_mqtt_client_t);
-	
-	/**
- 	* @ingroup mqtt
-	* Connect to MQTT server
-	* @param client MQTT client
- 	* @param ip_addr Server IP
- 	* @param port Server port
- 	* @param cb Connection state change callback
- 	* @param arg User supplied argument to connection callback
- 	* @param client_info Client identification and connection options
- 	* @return ERR_OK if successful, @see err_t enum for other results
- 
-err_t
-mqtt_client_connect(mqtt_client_t *client, const ip_addr_t *ip_addr, u16_t port, mqtt_connection_cb_t cb, void *arg,
-                    const struct mqtt_connect_client_info_t *client_info)
-	*/
-	
-	//err_t = mqtt_client_connect(a_mqtt_client_t, MQTT_SERVER, mqtt_port,  cb, client_info_t);
-    
-	
-	/*The line was failing */
-    //a_mqtt_client = mqtt_client_new(void);
-	/*The next 2 lines were what was being done by failing code */
-	LWIP_ASSERT_CORE_LOCKED();
-	a_mqtt_client_t = (mqtt_client_t *)mem_calloc(1, sizeof(mqtt_client_t));
-	printf("sizeof(mqtt_client_t) 0x%x %d \n",sizeof(mqtt_client_t),sizeof(mqtt_client_t));
-	printf("a_mqtt_client_t 0x%x  *a_mqtt_client_t 0x%x \n", a_mqtt_client_t, *a_mqtt_client_t);
     while (true) {
 #if 0 && configNUM_CORES > 1
         static int last_core_id;
