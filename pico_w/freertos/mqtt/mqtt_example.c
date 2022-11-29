@@ -28,6 +28,10 @@
  */
 #include "pico/cyw43_arch.h"
 #include "pico/stdlib.h"
+/*needed for GPIO from pico-examples/gpio/hello_7segment/hello_7segment.c
+gpio will be an additional freertos task
+*/
+#include "hardware/gpio.h"
 
 #include "lwip/netif.h"
 #include "lwip/ip4_addr.h"
@@ -35,6 +39,11 @@
 //#include "pw_ssid.h"
 #include "FreeRTOS.h"
 #include "task.h"
+/*needed for GPIO from pico-examples/gpio/hello_7segment/hello_7segment.c
+gpio will be an additional freertos task
+*/
+#define FIRST_GPIO 2
+#define BUTTON_GPIO (FIRST_GPIO+7)
 #ifndef RUN_FREERTOS_ON_CORE
 #define RUN_FREERTOS_ON_CORE 0
 #endif
@@ -229,6 +238,67 @@ void mqtt_task(__unused void *params) {
     }
 }
 
+void gpio_task(__unused void *params) {
+    //bool on = false;
+    printf("gpio_task starts\n");
+     while (true) {
+#if 0 && configNUM_CORES > 1
+        static int last_core_id;
+        if (portGET_CORE_ID() != last_core_id) {
+            last_core_id = portGET_CORE_ID();
+            printf("gpio now from core %d\n", last_core_id);
+        }
+#endif
+        //cyw43_arch_gpio_put(0, on);
+        //on = !on;
+        
+// We could use gpio_set_dir_out_masked() here
+    for (int gpio = FIRST_GPIO; gpio < FIRST_GPIO + 7; gpio++) {
+        gpio_init(gpio);
+        gpio_set_dir(gpio, GPIO_OUT);
+        // Our bitmap above has a bit set where we need an LED on, BUT, we are pulling low to light
+        // so invert our output
+        gpio_set_outover(gpio, GPIO_OVERRIDE_INVERT);
+    }
+
+    gpio_init(BUTTON_GPIO);
+    gpio_set_dir(BUTTON_GPIO, GPIO_IN);
+    // We are using the button to pull down to 0v when pressed, so ensure that when
+    // unpressed, it uses internal pull ups. Otherwise when unpressed, the input will
+    // be floating.
+    gpio_pull_up(BUTTON_GPIO);
+
+    int val = 0;
+    while (true) {
+        // Count upwards or downwards depending on button input
+        // We are pulling down on switch active, so invert the get to make
+        // a press count downwards
+        if (!gpio_get(BUTTON_GPIO)) {
+            if (val == 9) {
+                val = 0;
+            } else {
+                val++;
+            }
+        } else if (val == 0) {
+            val = 9;
+        } else {
+            val--;
+        }
+
+        // We are starting with GPIO 2, our bitmap starts at bit 0 so shift to start at 2.
+        int32_t mask = bits[val] << FIRST_GPIO;
+
+        // Set all our GPIOs in one go!
+        // If something else is using GPIO, we might want to use gpio_put_masked()
+        gpio_set_mask(mask);
+        sleep_ms(250);
+        gpio_clr_mask(mask);
+    }
+        
+        vTaskDelay(200);
+    }
+}
+
 
 int main() {
     stdio_init_all();
@@ -252,6 +322,12 @@ int main() {
         printf("IPADDR_LOOPBACK = 0x%x \n",IPADDR_LOOPBACK);
         mqtt_example_init();
     }
+
+    xTaskCreate(blink_task, "BlinkThread", configMINIMAL_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
+
+    xTaskCreate(gpio_task, "GPIOThread", configMINIMAL_STACK_SIZE, NULL, GPIO_TASK_PRIORITY, NULL);
+
+	xTaskCreate(mqtt_task, "MQTTThread", configMINIMAL_STACK_SIZE, NULL, MQTT_TASK_PRIORITY, NULL);
 
 #if CLIENT_TEST
     printf("\nReady, running iperf client\n");
