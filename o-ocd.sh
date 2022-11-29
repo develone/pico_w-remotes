@@ -1,2 +1,2 @@
 #!/bin/bash
-openocd -f interface/raspberrypi-swd.cfg -f target/rp2040.cfg -c "program pico_w/freertos/iperf/picow_freertos_iperf_server_nosys.elf verify reset exit"
+openocd -f interface/raspberrypi-swd.cfg -f target/rp2040.cfg -c "program pico_w/freertos/mqtt/picow_freertos_iperf_mqtt.elf verify reset exit"
