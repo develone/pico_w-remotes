@@ -1,7 +1,9 @@
 add_executable(picow_freertos_iperf_mqtt
         mqtt_example.c
 		mqtt.c
-		mqtt_example.h 
+		mqtt_example.h
+		crc.h
+		crc16.h 
         )
 target_compile_definitions(picow_freertos_iperf_mqtt PRIVATE
         WIFI_SSID=\"${WIFI_SSID}\"
@@ -15,7 +17,8 @@ target_link_libraries(picow_freertos_iperf_mqtt
         pico_cyw43_arch_lwip_threadsafe_background
         pico_stdlib
         pico_lwip_iperf
-        FreeRTOS-Kernel-Heap4 # FreeRTOS kernel and dynamic heap	
+        FreeRTOS-Kernel-Heap4 # FreeRTOS kernel and dynamic heap
+        crc_crc16	
         )
 pico_add_extra_outputs(picow_freertos_iperf_mqtt)
 

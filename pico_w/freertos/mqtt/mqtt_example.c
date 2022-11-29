@@ -299,6 +299,60 @@ void gpio_task(__unused void *params) {
     }
 }
 
+void main_task(__unused void *params) {
+
+    if (cyw43_arch_init()) {
+        printf("failed to initialise\n");
+        return;
+    }
+    cyw43_arch_enable_sta_mode();
+    printf("Connecting to WiFi...\n");
+    if (cyw43_arch_wifi_connect_timeout_ms("nanotest", "12345678", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
+        printf("failed to connect.\n");
+        exit(1);
+    } else {
+        printf("Connected.\n");
+    }
+
+    xTaskCreate(blink_task, "BlinkThread", configMINIMAL_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
+
+    xTaskCreate(gpio_task, "GPIOThread", configMINIMAL_STACK_SIZE, NULL, GPIO_TASK_PRIORITY, NULL);
+
+	xTaskCreate(mqtt_task, "MQTTThread", configMINIMAL_STACK_SIZE, NULL, MQTT_TASK_PRIORITY, NULL);
+
+#if CLIENT_TEST
+    printf("\nReady, running iperf client\n");
+    ip_addr_t clientaddr;
+    ip4_addr_set_u32(&clientaddr, ipaddr_addr(xstr(IPERF_SERVER_IP)));
+    assert(lwiperf_start_tcp_client_default(&clientaddr, &iperf_report, NULL) != NULL);
+#else
+    printf("\nReady, running iperf server at %s\n", ip4addr_ntoa(netif_ip4_addr(netif_list)));
+    lwiperf_start_tcp_server_default(&iperf_report, NULL);
+#endif
+
+    while(true) {
+        // not much to do as LED is in another task, and we're using RAW (callback) lwIP API
+        vTaskDelay(100);
+    }
+
+    cyw43_arch_deinit();
+}
+
+void vLaunch( void) {
+    TaskHandle_t task;
+    xTaskCreate(main_task, "TestMainThread", configMINIMAL_STACK_SIZE, NULL, TEST_TASK_PRIORITY, &task);
+
+#if NO_SYS && configUSE_CORE_AFFINITY && configNUM_CORES > 1
+    // we must bind the main task to one core (well at least while the init is called)
+    // (note we only do this in NO_SYS mode, because cyw43_arch_freertos
+    // takes care of it otherwise)
+    vTaskCoreAffinitySet(task, 1);
+#endif
+
+    /* Start the tasks and timer running. */
+    vTaskStartScheduler();
+}
+
 
 int main() {
     stdio_init_all();
