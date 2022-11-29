@@ -39,6 +39,20 @@
 #define RUN_FREERTOS_ON_CORE 0
 #endif
 
+// This array converts a number 0-9 to a bit pattern to send to the GPIOs
+int bits[10] = {
+        0x3f,  // 0
+        0x06,  // 1
+        0x5b,  // 2
+        0x4f,  // 3
+        0x66,  // 4
+        0x6d,  // 5
+        0x7d,  // 6
+        0x07,  // 7
+        0x7f,  // 8
+        0x67   // 9
+};
+
 #define TEST_TASK_PRIORITY				( tskIDLE_PRIORITY + 2UL )
 #define BLINK_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
 #define GPIO_TASK_PRIORITY				( tskIDLE_PRIORITY + 3UL )
@@ -178,6 +192,43 @@ static void iperf_report(void *arg, enum lwiperf_report_type report_type,
     printf("packets in %u packets out %u\n", CYW43_STAT_GET(PACKET_IN_COUNT), CYW43_STAT_GET(PACKET_OUT_COUNT));
 #endif
 }
+
+void blink_task(__unused void *params) {
+    bool on = false;
+    printf("blink_task starts\n");
+    while (true) {
+#if 0 && configNUM_CORES > 1
+        static int last_core_id;
+        if (portGET_CORE_ID() != last_core_id) {
+            last_core_id = portGET_CORE_ID();
+            printf("blinking now from core %d\n", last_core_id);
+        }
+#endif
+        cyw43_arch_gpio_put(0, on);
+        on = !on;
+        vTaskDelay(200);
+    }
+} 
+
+void mqtt_task(__unused void *params) {
+    //bool on = false;
+    printf("mqtt_task starts\n");
+    while (true) {
+#if 0 && configNUM_CORES > 1
+        static int last_core_id;
+        if (portGET_CORE_ID() != last_core_id) {
+            last_core_id = portGET_CORE_ID();
+            printf("mqtt now from core %d\n", last_core_id);
+        }
+#endif
+        //cyw43_arch_gpio_put(0, on);
+        //on = !on;
+  
+        
+        vTaskDelay(200);
+    }
+}
+
 
 int main() {
     stdio_init_all();
