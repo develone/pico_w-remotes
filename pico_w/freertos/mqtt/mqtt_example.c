@@ -356,76 +356,33 @@ void vLaunch( void) {
 
 int main() {
     stdio_init_all();
+    printf("adding gpio support to the program\n");
+	unsigned char message[3] = {0xd3, 0x01, 0x00};
+	buildCRCTable();
+	printf("Back from buildCRCTable \n");
+	message[2] = getCRC(message, 2); 
+	printf("0x%x 0x%x 0x%x \n",message[0],message[1],message[2]);
+    /* Configure the hardware ready to run the demo. */
+    const char *rtos_name;
 
-    if (cyw43_arch_init()) {
-        printf("failed to initialise\n");
-        return 1;
-    }
-    cyw43_arch_enable_sta_mode();
-    printf("Connecting to WiFi...\n");
-    if (cyw43_arch_wifi_connect_timeout_ms("nanotest", "12345678", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
-        printf("failed to connect.\n");
-        return 1;
-    } else {
-        printf("Connected.\n");
-	     
- 
-			
-        printf("mqtt_port = %d &mqtt_port 0x%x\n",mqtt_port,&mqtt_port);
-        printf("mqtt_ip = 0x%x &mqtt_ip = 0x%x\n",mqtt_ip,&mqtt_ip);
-        printf("IPADDR_LOOPBACK = 0x%x \n",IPADDR_LOOPBACK);
-        mqtt_example_init();
-    }
-
-    xTaskCreate(blink_task, "BlinkThread", configMINIMAL_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
-
-    xTaskCreate(gpio_task, "GPIOThread", configMINIMAL_STACK_SIZE, NULL, GPIO_TASK_PRIORITY, NULL);
-
-	xTaskCreate(mqtt_task, "MQTTThread", configMINIMAL_STACK_SIZE, NULL, MQTT_TASK_PRIORITY, NULL);
-
-#if CLIENT_TEST
-    printf("\nReady, running iperf client\n");
-    ip_addr_t clientaddr;
-    ip4_addr_set_u32(&clientaddr, ipaddr_addr(xstr(IPERF_SERVER_IP)));
-    assert(lwiperf_start_tcp_client_default(&clientaddr, &iperf_report, NULL) != NULL);
+    
+    
+#if ( portSUPPORT_SMP == 1 )
+    rtos_name = "FreeRTOS SMP";
 #else
-    printf("\nReady, running iperf server at %s\n", ip4addr_ntoa(netif_ip4_addr(netif_list)));
-     
-    lwiperf_start_tcp_server_default(&iperf_report, NULL);
+    rtos_name = "FreeRTOS";
 #endif
 
-    while(true) {
-#if USE_LED
-        static absolute_time_t led_time;
-        static int led_on = true;
-
-        // Invert the led
-        if (absolute_time_diff_us(get_absolute_time(), led_time) < 0) {
-            led_on = !led_on;
-            cyw43_gpio_set(&cyw43_state, 0, led_on);
-            led_time = make_timeout_time_ms(1000);
-
-            // Check we can read back the led value
-            bool actual_led_val = !led_on;
-            cyw43_gpio_get(&cyw43_state, 0, &actual_led_val);
-            assert(led_on == actual_led_val);
-        }
-#endif
-        // the following #ifdef is only here so this same example can be used in multiple modes;
-        // you do not need it in your code
-#if PICO_CYW43_ARCH_POLL
-        // if you are using pico_cyw43_arch_poll, then you must poll periodically from your
-        // main loop (not from a timer) to check for WiFi driver or lwIP work that needs to be done.
-        cyw43_arch_poll();
-        sleep_ms(1);
+#if ( portSUPPORT_SMP == 1 ) && ( configNUM_CORES == 2 )
+    printf("Starting %s on both cores:\n", rtos_name);
+    vLaunch();
+#elif ( RUN_FREE_RTOS_ON_CORE == 1 )
+    printf("Starting %s on core 1:\n", rtos_name);
+    multicore_launch_core1(vLaunch);
+    while (true);
 #else
-        // if you are not using pico_cyw43_arch_poll, then WiFI driver and lwIP work
-        // is done via interrupt in the background. This sleep is just an example of some (blocking)
-        // work you might be doing.
-        sleep_ms(1000);
+    printf("Starting %s on core 0:\n", rtos_name);
+    vLaunch();
 #endif
-    }
-
-    cyw43_arch_deinit();
     return 0;
 }
