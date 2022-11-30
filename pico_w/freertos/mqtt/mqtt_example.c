@@ -312,6 +312,10 @@ void main_task(__unused void *params) {
         exit(1);
     } else {
         printf("Connected.\n");
+        printf("mqtt_port = %d &mqtt_port 0x%x\n",mqtt_port,&mqtt_port);
+        printf("mqtt_ip = 0x%x &mqtt_ip = 0x%x\n",mqtt_ip,&mqtt_ip);
+        printf("IPADDR_LOOPBACK = 0x%x \n",IPADDR_LOOPBACK);
+        mqtt_example_init();
     }
 
     xTaskCreate(blink_task, "BlinkThread", configMINIMAL_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
