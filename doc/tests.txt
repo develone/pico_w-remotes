@@ -1,0 +1,139 @@
+pi4-35	remote1	192.168.1.176
+adding gpio support to the program
+Back from buildCRCTable 
+0xd3 0x1 0x2e 
+Starting FreeRTOS on core 0:
+Connecting to WiFi...
+Connected.
+mqtt_port = 9883 &mqtt_port 0x200005a4
+mqtt_ip = 0xe501a8c0 &mqtt_ip = 0x200005a0
+IPADDR_LOOPBACK = 0x7f000001 
+mqtt_client 0x20021f50 &mqtt_client 0x20000f5c 
+mqtt_set_inpub_callback 0x10001359
+mqtt_client_connect 0x10001371
+gpio_task starts
+mqtt_task starts
+
+Ready, running iperf server at 192.168.1.176
+blink_task starts
+MQTT client "remote1" connection cb: status 0
+MQTT client "remote1" request cb: err 0
+MQTT client "remote1" request cb: err 0
+
+pi4-36	remote2	192.168.1.160
+adding gpio support to the program
+Back from buildCRCTable 
+0xd3 0x1 0x2e 
+Starting FreeRTOS on core 0:
+Connecting to WiFi...
+Connected.
+mqtt_port = 9883 &mqtt_port 0x200005a4
+mqtt_ip = 0xe501a8c0 &mqtt_ip = 0x200005a0
+IPADDR_LOOPBACK = 0x7f000001 
+mqtt_client 0x20021f50 &mqtt_client 0x20000f5c 
+mqtt_set_inpub_callback 0x10001359
+mqtt_client_connect 0x10001371
+gpio_task starts
+mqtt_task starts
+
+Ready, running iperf server at 192.168.1.160
+blink_task starts
+MQTT client "remote2" connection cb: status 0
+MQTT client "remote2" request cb: err 0
+MQTT client "remote2" request cb: err 0
+
+pi4-38	remote5	192.168.1.159
+adding gpio support to the program
+Back from buildCRCTable 
+0xd3 0x1 0x2e 
+Starting FreeRTOS on core 0:
+Connecting to WiFi...
+Connected.
+mqtt_port = 9883 &mqtt_port 0x200005a4
+mqtt_ip = 0xe501a8c0 &mqtt_ip = 0x200005a0
+IPADDR_LOOPBACK = 0x7f000001 
+mqtt_client 0x20021f50 &mqtt_client 0x20000f5c 
+mqtt_set_inpub_callback 0x10001359
+mqtt_client_connect 0x10001371
+gpio_task starts
+mqtt_task starts
+
+Ready, running iperf server at 192.168.1.159
+blink_task starts
+MQTT client "remote5" connection cb: status 0
+MQTT client "remote5" request cb: err 0
+MQTT client "remote5" request cb: err 0
+
+pi4-28 	remote6	192.168.1.175
+adding gpio support to the program
+Back from buildCRCTable 
+0xd3 0x1 0x2e 
+Starting FreeRTOS on core 0:
+Connecting to WiFi...
+Connected.
+mqtt_port = 9883 &mqtt_port 0x200005a4
+mqtt_ip = 0xe501a8c0 &mqtt_ip = 0x200005a0
+IPADDR_LOOPBACK = 0x7f000001 
+mqtt_client 0x20021f50 &mqtt_client 0x20000f5c 
+mqtt_set_inpub_callback 0x10001359
+mqtt_client_connect 0x10001371
+gpio_task starts
+mqtt_task starts
+
+Ready, running iperf server at 192.168.1.175                                    
+blink_task starts                                                               
+MQTT client "remote6" connection cb: status 0                                   
+MQTT client "remote6" request cb: err 0                                         
+MQTT client "remote6" request cb: err 0
+
+Nmap scan report for remote1.attlocal.net (192.168.1.176)
+Host is up (0.0057s latency).
+Not shown: 999 closed ports
+PORT     STATE SERVICE
+5001/tcp open  commplex-link
+
+Nmap scan report for remote2.attlocal.net (192.168.1.160)
+Host is up (0.0041s latency).
+Not shown: 999 closed ports
+PORT     STATE SERVICE
+5001/tcp open  commplex-link
+
+Nmap scan report for remote5.attlocal.net (192.168.1.175)
+Host is up (0.0043s latency).
+Not shown: 999 closed ports
+PORT     STATE SERVICE
+5001/tcp open  commplex-link
+
+devel@pi4-35:~ $ iperf -c 192.168.1.159
+------------------------------------------------------------
+Client connecting to 192.168.1.159, TCP port 5001
+TCP window size: 85.0 KByte (default)
+------------------------------------------------------------
+[  3] local 192.168.1.157 port 49852 connected with 192.168.1.159 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3] 0.0000-10.0065 sec  18.0 MBytes  15.1 Mbits/sec
+devel@pi4-35:~ $ iperf -c 192.168.1.160
+------------------------------------------------------------
+Client connecting to 192.168.1.160, TCP port 5001
+TCP window size: 85.0 KByte (default)
+------------------------------------------------------------
+[  3] local 192.168.1.157 port 43436 connected with 192.168.1.160 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3] 0.0000-10.0603 sec  18.3 MBytes  15.2 Mbits/sec
+devel@pi4-35:~ $ iperf -c 192.168.1.175
+------------------------------------------------------------
+Client connecting to 192.168.1.175, TCP port 5001
+TCP window size: 85.0 KByte (default)
+------------------------------------------------------------
+[  3] local 192.168.1.157 port 34278 connected with 192.168.1.175 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3] 0.0000-10.0354 sec  17.8 MBytes  14.8 Mbits/sec
+devel@pi4-35:~ $ iperf -c 192.168.1.176
+------------------------------------------------------------
+Client connecting to 192.168.1.176, TCP port 5001
+TCP window size: 85.0 KByte (default)
+------------------------------------------------------------
+[  3] local 192.168.1.157 port 48524 connected with 192.168.1.176 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  3] 0.0000-10.0506 sec  18.0 MBytes  15.0 Mbits/sec
+
