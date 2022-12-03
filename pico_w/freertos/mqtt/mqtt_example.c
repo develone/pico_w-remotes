@@ -71,9 +71,9 @@ int bits[10] = {
 #endif
 #include "lwip/apps/mqtt.h"
 #include "mqtt_example.h"
- 
-u16_t mqtt_port = 9883;
-//u16_t mqtt_port = 1883;
+mqtt_request_cb_t pub_mqtt_request_cb_t; 
+//u16_t mqtt_port = 9883;
+u16_t mqtt_port = 1883;
 #if LWIP_TCP
 
 /** Define this to a compile-time IP address initialization
@@ -171,12 +171,14 @@ mqtt_example_init(void)
           LWIP_CONST_CAST(void*, &mqtt_client_info));
   printf("mqtt_set_inpub_callback 0x%x\n",mqtt_set_inpub_callback);
   
-  
+  char PUB_PAYLOAD[] = "this is a message from pico_w";
+  printf("%s  %d \n",PUB_PAYLOAD,sizeof(PUB_PAYLOAD));
   mqtt_client_connect(mqtt_client,
           &mqtt_ip, mqtt_port,
           mqtt_connection_cb, LWIP_CONST_CAST(void*, &mqtt_client_info),
           &mqtt_client_info);
   printf("mqtt_client_connect 0x%x\n",mqtt_client_connect);
+  mqtt_publish(mqtt_client,"update/memo",PUB_PAYLOAD,sizeof(PUB_PAYLOAD),2,0,pub_mqtt_request_cb_t,"test");
           
 #endif /* LWIP_TCP */
 }
@@ -232,7 +234,6 @@ void mqtt_task(__unused void *params) {
 #endif
         //cyw43_arch_gpio_put(0, on);
         //on = !on;
-  
         
         vTaskDelay(200);
     }
