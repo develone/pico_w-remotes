@@ -91,6 +91,9 @@ u16_t mqtt_port = 1883;
 #endif
 #endif
 
+char PUB_PAYLOAD[] = "this is a message from pico_w ";
+char PUB_EXTRA_ARG[] = "test";
+u16_t payload_size;
 
 static ip_addr_t mqtt_ip LWIP_MQTT_EXAMPLE_IPADDR_INIT;
 static mqtt_client_t* mqtt_client;
@@ -171,14 +174,24 @@ mqtt_example_init(void)
           LWIP_CONST_CAST(void*, &mqtt_client_info));
   printf("mqtt_set_inpub_callback 0x%x\n",mqtt_set_inpub_callback);
   
-  char PUB_PAYLOAD[] = "this is a message from pico_w";
-  printf("%s  %d \n",PUB_PAYLOAD,sizeof(PUB_PAYLOAD));
+
   mqtt_client_connect(mqtt_client,
           &mqtt_ip, mqtt_port,
           mqtt_connection_cb, LWIP_CONST_CAST(void*, &mqtt_client_info),
           &mqtt_client_info);
   printf("mqtt_client_connect 0x%x\n",mqtt_client_connect);
-  mqtt_publish(mqtt_client,"update/memo",PUB_PAYLOAD,sizeof(PUB_PAYLOAD),2,0,pub_mqtt_request_cb_t,"test");
+
+ /* Trying to find the client_id such that it can be added to the PUB_PAYLOAD
+ The infor below is found picow_freertos_iperf_mqtt.elf.map
+ .rodata.mqtt_client_info
+                0x0000000010018bec       0x1c CMakeFiles/picow_freertos_iperf_mqtt.dir/mqtt_example.c.obj 
+ */ 
+  printf("0x%x \n",LWIP_CONST_CAST(void*, &mqtt_client_info));
+   
+  payload_size = sizeof(PUB_PAYLOAD);
+  printf("%s  %d \n",PUB_PAYLOAD,sizeof(PUB_PAYLOAD));
+  mqtt_publish(mqtt_client,"update/memo",PUB_PAYLOAD,payload_size,2,0,pub_mqtt_request_cb_t,PUB_EXTRA_ARG);
+   
           
 #endif /* LWIP_TCP */
 }
