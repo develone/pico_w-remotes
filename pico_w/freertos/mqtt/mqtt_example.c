@@ -230,7 +230,7 @@ mqtt_example_init(void)
                 0x0000000010018bec       0x1c CMakeFiles/picow_freertos_iperf_mqtt.dir/mqtt_example.c.obj 
  */ 
   printf("0x%x \n",LWIP_CONST_CAST(void*, &mqtt_client_info));
-   
+  strcat( PUB_PAYLOAD,CYW43_HOST_NAME);
   payload_size = sizeof(PUB_PAYLOAD);
   printf("%s  %d \n",PUB_PAYLOAD,sizeof(PUB_PAYLOAD));
   mqtt_publish(mqtt_client,"update/memo",PUB_PAYLOAD,payload_size,2,0,pub_mqtt_request_cb_t,PUB_EXTRA_ARG);
