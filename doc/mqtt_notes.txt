@@ -1,3 +1,6 @@
+openocd -f interface/raspberrypi-swd.cfg -f target/rp2040.cfg -c "program pico_w/freertos/iperf/picow_freertos_iperf_server_nosys.elf verify reset exit"
+openocd -f interface/raspberrypi-swd.cfg -f target/rp2040.cfg -c "program pico_w/mqtt/mqtt_example.elf verify reset exit"
+openocd -f interface/raspberrypi-swd.cfg -f target/rp2040.cfg -c "program pico_w/freertos/ping/picow_freertos_ping_nosys.elf verify reset exit"
 Posted on Twitter.
 Has anyone used mqtt.c from pico-sdk lwip lib?
 error: expected expression before 'void'
