@@ -76,7 +76,7 @@ gpio will be an additional freertos task
 #include "lwip/netif.h"
 #include "lwip/ip4_addr.h"
 #include "lwip/apps/lwiperf.h"
-#include "pw_ssid.h"
+//#include "pw_ssid.h"
 #include "FreeRTOS.h"
 #include "task.h"
 /*needed for GPIO from pico-examples/gpio/hello_7segment/hello_7segment.c
@@ -384,7 +384,7 @@ void main_task(__unused void *params) {
     }
     cyw43_arch_enable_sta_mode();
     printf("Connecting to WiFi...\n");
-    if (cyw43_arch_wifi_connect_timeout_ms("ATTtpHTfPi", WIFI_PASSWORD, CYW43_AUTH_WPA2_AES_PSK, 30000)) {
+    if (cyw43_arch_wifi_connect_timeout_ms(WIFI_SSID, WIFI_PASSWORD, CYW43_AUTH_WPA2_AES_PSK, 30000)) {
         printf("failed to connect.\n");
         exit(1);
     } else {
