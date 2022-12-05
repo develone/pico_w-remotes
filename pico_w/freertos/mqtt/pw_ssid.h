@@ -1,7 +1,7 @@
 #ifndef _SSID_H
 #define _SSID_H
 
-char WIFI_PASSWORD[] = "your_ssid_password";
+char WIFI_PASSWORD[] = "t?bqxvcqh#6t";
  
 
 
