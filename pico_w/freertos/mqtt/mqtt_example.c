@@ -143,7 +143,7 @@ static mqtt_client_t* mqtt_client;
 
 static const struct mqtt_connect_client_info_t mqtt_client_info =
 {
-  "remote6",
+  CYW43_HOST_NAME,
   "testuser", /* user */
   "password123", /* pass */
   100,  /* keep alive */
