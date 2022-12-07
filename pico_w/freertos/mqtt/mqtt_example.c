@@ -134,7 +134,8 @@ u16_t mqtt_port = 1883;
 #endif
 #endif
 
-char PUB_PAYLOAD[] = "this is a message from pico_w        ";
+char PUB_PAYLOAD[] = "this is a message from pico_w ctrl 0       ";
+char PUB_PAYLOAD_SCR[] = "this is a message from pico_w ctrl 0       ";
 char PUB_EXTRA_ARG[] = "test";
 u16_t payload_size;
 
@@ -147,7 +148,7 @@ static const struct mqtt_connect_client_info_t mqtt_client_info =
   "testuser", /* user */
   "password123", /* pass */
   100,  /* keep alive */
-  "update/memo", /* will_topic */
+  "topic_qos0", /* will_topic */
   NULL, /* will_msg */
   0,    /* will_qos */
   0     /* will_retain */
@@ -224,17 +225,15 @@ mqtt_example_init(void)
           &mqtt_client_info);
   printf("mqtt_client_connect 0x%x\n",mqtt_client_connect);
 
- /* Trying to find the client_id such that it can be added to the PUB_PAYLOAD
- The infor below is found picow_freertos_iperf_mqtt.elf.map
- .rodata.mqtt_client_info
-                0x0000000010018bec       0x1c CMakeFiles/picow_freertos_iperf_mqtt.dir/mqtt_example.c.obj 
- */ 
-  printf("0x%x \n",LWIP_CONST_CAST(void*, &mqtt_client_info));
-  strcat( PUB_PAYLOAD,CYW43_HOST_NAME);
-  payload_size = sizeof(PUB_PAYLOAD) + 7;
-  printf("%s  %d \n",PUB_PAYLOAD,sizeof(PUB_PAYLOAD));
-  mqtt_publish(mqtt_client,"update/memo",PUB_PAYLOAD,payload_size,2,0,pub_mqtt_request_cb_t,PUB_EXTRA_ARG);
-   
+ 
+  //printf("0x%x \n",LWIP_CONST_CAST(void*, &mqtt_client_info));
+/*
+  strcpy(PUB_PAYLOAD_SCR,PUB_PAYLOAD);
+  strcat( PUB_PAYLOAD_SCR,CYW43_HOST_NAME);
+  payload_size = sizeof(PUB_PAYLOAD_SCR) + 7;
+  printf("%s  %d \n",PUB_PAYLOAD_SCR,sizeof(PUB_PAYLOAD_SCR));
+  mqtt_publish(mqtt_client,"update/memo",PUB_PAYLOAD_SCR,payload_size,2,0,pub_mqtt_request_cb_t,PUB_EXTRA_ARG);
+*/   
           
 #endif /* LWIP_TCP */
 }
@@ -310,8 +309,14 @@ void mqtt_task(__unused void *params) {
 #endif
         //cyw43_arch_gpio_put(0, on);
         //on = !on;
-        
-        vTaskDelay(200);
+        printf("in mqtt\n");
+  strcpy(PUB_PAYLOAD_SCR,PUB_PAYLOAD);
+  strcat( PUB_PAYLOAD_SCR,CYW43_HOST_NAME);
+  payload_size = sizeof(PUB_PAYLOAD_SCR) + 7;
+  printf("%s  %d \n",PUB_PAYLOAD_SCR,sizeof(PUB_PAYLOAD_SCR));
+  mqtt_publish(mqtt_client,"update/memo",PUB_PAYLOAD_SCR,payload_size,2,0,pub_mqtt_request_cb_t,PUB_EXTRA_ARG);
+
+        vTaskDelay(25000);
     }
 }
 
