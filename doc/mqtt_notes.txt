@@ -1,3 +1,145 @@
+12/05/22
+This repo creates 6 pico_w/freertos/mqtt/picow_freertos_iperf_mqtt.elf & 
+pico_w/freertos/mqtt/picow_freertos_iperf_mqtt.uf2 in folders remote1 to remote6.
+It only takes 6 minutes on RPi4B 4Gb.
+Each of pico_w will have a different hostname and client id.
+Afer booting a message is published to topic 'update/memo'.
+A Real time Clock is provided.
+The pico_w/freertos/mqtt/picow_freertos_iperf_mqtt.elf created will connect with several ntp clients.
+The pico_w/freertos/mqtt/picow_freertos_iperf_mqtt.elf created will toogle 7 GPIOs
+The pico_w/freertos/mqtt/picow_freertos_iperf_mqtt.elf created will receive messages
+published by remotes on topics topic_qps0 & topic_qps1.
+
+This is used to set your PATH, needed for openocd & qemu.
+. Ultibo_Projects/picoultibo.sh	
+
+git clone https://github.com/develone/pico_w-remotes.git
+
+cd pico_w-remotes/
+
+Modify these 3 files for your WIFI_SSID & WIFI_PASSWORD 
+mousepad 6remotes.sh pico_w/freertos/mqtt/pw_ssid.h pico_w/freertos/mqtt/mqtt_example.c &
+ 
+gitk &
+
+./6remotes.sh 
+
+cd remotex/ where x 1 to 6
+
+../o-ocd.sh .
+
+./o-ocd.sh
+
+RTC Alarm!                                                                     
+adding gpio support to the program                                             
+Back from buildCRCTable                                                        
+0xd3 0x1 0x2e                                                                  
+Starting FreeRTOS on core 0:                                                   
+Connecting to WiFi...                                                          
+Connected.                                                                     
+mqtt_port = 1883 &mqtt_port 0x200005cc                                         
+mqtt_ip = 0xe501a8c0 &mqtt_ip = 0x200005c8                                     
+IPADDR_LOOPBACK = 0x7f000001                                                   
+mqtt_client 0x20022800 &mqtt_client 0x20001800                                 
+mqtt_set_inpub_callback 0x10001ae5                                             
+mqtt_client_connect 0x10001afd                                                 
+0x1001ac18                                                                     
+this is a message from pico_w remote5  31                                      
+gpio_task starts                                                               
+mqtt_task starts                                                               
+ntp_task starts                                                                
+                                                                               
+Ready, running iperf server at 192.168.1.159                                   
+blink_task starts                                                              
+MQTT client "remote5" connection cb: status 0                                  
+MQTT client "remote5" request cb: err 0                                        
+MQTT client "remote5" request cb: err 0                                        
+ntp address 192.48.105.15                                                      
+got ntp response: 05/12/2022 17:32:33                                          
+got ntp response: 05/12/2022 17:33:03                                          
+got ntp response: 05/12/2022 17:33:34                                          
+got ntp response: 05/12/2022 17:34:05                                          
+Alarm Fired At Wednesday 13 January 11:22:05 2020                              
+ntp request failed                                                             
+MQTT client "remote5" connection cb: status 256                                
+ntp address 204.93.207.12                                                      
+got ntp response: 05/12/2022 17:35:16                                          
+got ntp response: 05/12/2022 17:35:47                                          
+ntp address 38.229.57.9                                                        
+got ntp response: 05/12/2022 17:36:18 
+
+devel@pi4-27:~ $ mosquitto -c /etc/mosquitto/mosquitto.conf
+1670287516: mosquitto version 2.0.11 starting
+1670287516: Config loaded from /etc/mosquitto/mosquitto.conf.
+1670287516: Opening ipv4 listen socket on port 9883.
+1670287516: Opening ipv6 listen socket on port 9883.
+1670287516: Opening ipv4 listen socket on port 1883.
+1670287516: Opening ipv6 listen socket on port 1883.
+1670287516: mosquitto version 2.0.11 running
+1670287518: New connection from ::1:44262 on port 1883.
+1670287518: New client connected from ::1:44262 as auto-9089C1D4-EB2C-E5C9-4DC5-B454C7B0B4CC (p2, c1, k60, u'testuser').
+1670287531: New connection from 2600:1700:69f0:42c0::34:56338 on port 1883.
+1670287531: New client connected from 2600:1700:69f0:42c0::34:56338 as auto-4BADC8B0-F291-93E3-925B-EE8D7FAD69C8 (p2, c1, k60, u'testuser').
+1670287559: New connection from 2600:1700:69f0:42c0::18:59966 on port 1883.
+1670287559: New client connected from 2600:1700:69f0:42c0::18:59966 as auto-249E7FF3-D62F-A546-807F-DABC70ABDBA8 (p2, c1, k60, u'testuser').
+1670287566: New connection from 2600:1700:69f0:42c0::2d:52998 on port 1883.
+1670287566: New client connected from 2600:1700:69f0:42c0::2d:52998 as auto-4770C9EE-17D0-A061-F1F5-24B458E43547 (p2, c1, k60, u'testuser').
+1670287599: New connection from 192.168.1.175:63971 on port 1883.
+1670287599: New client connected from 192.168.1.175:63971 as remote6 (p2, c1, k100, u'testuser').
+1670287622: New connection from 192.168.1.159:64666 on port 1883.
+1670287622: New client connected from 192.168.1.159:64666 as remote5 (p2, c1, k100, u'testuser').
+1670287641: New connection from 192.168.1.160:57901 on port 1883.
+1670287641: New client connected from 192.168.1.160:57901 as remote2 (p2, c1, k100, u'testuser').
+1670287655: New connection from 2600:1700:69f0:42c0::24:43074 on port 1883.
+1670287655: New client connected from 2600:1700:69f0:42c0::24:43074 as auto-07ADB2D3-72FB-9844-DD47-D44601A6998A (p2, c1, k60, u'testuser').
+1670287718: New connection from 192.168.1.160:61299 on port 1883.
+1670287718: Client remote2 already connected, closing old connection.
+1670287718: New client connected from 192.168.1.160:61299 as remote2 (p2, c1, k100, u'testuser').
+1670287750: Client remote6 has exceeded timeout, disconnecting.
+1670287774: Client remote5 has exceeded timeout, disconnecting.
+1670287817: New connection from 192.168.1.176:56263 on port 1883.
+1670287817: New client connected from 192.168.1.176:56263 as remote1 (p2, c1, k100, u'testuser').
+
+devel@pi4-27:~ $ mosquitto_pub -t 'topic_qos0' -u 'testuser' -P 'password123' -m 'topic_qos0 local msg1'
+
+devel@pi4-27:~ $ mosquitto_pub -t 'topic_qos1' -u 'testuser' -P 'password123' -m 'topic_qos1 local msg1'
+
+devel@pi4-38:~ $ mosquitto_pub -h pi4-27 -p 1883 -t 'topic_qos0' -u 'testuser' -P 'password123' -m 'topic_qos0 remote msg1'
+
+devel@pi4-38:~ $ mosquitto_pub -h pi4-27 -p 1883 -t 'topic_qos1' -u 'testuser' -P 'password123' -m 'topic_qos1 remote msg1'
+
+pico_w receives message published by RPi4B 
+
+MQTT client "remote6" publish cb: topic topic_qos0, len 26                      
+MQTT client "remote6" data cb: len 26, flags 1                                  
+MQTT client "remote6" publish cb: topic topic_qos0, len 27                      
+MQTT client "remote6" data cb: len 27, flags 1                                  
+got ntp response: 06/12/2022 13:17:49                                           
+MQTT client "remote6" publish cb: topic topic_qos1, len 26                      
+MQTT client "remote6" data cb: len 26, flags 1                                  
+MQTT client "remote6" publish cb: topic topic_qos1, len 27
+  
+devel@pi4-27:~ $ mosquitto_sub -t 'update/memo' -u 'testuser' -P 'password123'
+this is a message from pico_w        remote5
+this is a message from pico_w        remote6
+this is a message from pico_w        remote5
+this is a message from pico_w        remote1
+this is a message from pico_w        remote2
+
+devel@pi4-38:~ $ mosquitto_sub -h pi4-27 -p 1883 -t 'update/memo' -u 'testuser' -P 'password123'
+this is a message from pico_w        remote5
+this is a message from pico_w        remote6
+this is a message from pico_w        remote5
+this is a message from pico_w        remote2
+
+devel@pi4-28:~ $ mosquitto_sub -h pi4-27 -p 1883 -t 'update/memo' -u 'testuser' -P 'password123'
+this is a message from pico_w        remote5
+this is a message from pico_w        remote6
+this is a message from pico_w        remote5
+this is a message from pico_w        remote1
+this is a message from pico_w        remote2
+
+
 openocd -f interface/raspberrypi-swd.cfg -f target/rp2040.cfg -c "program pico_w/freertos/iperf/picow_freertos_iperf_server_nosys.elf verify reset exit"
 openocd -f interface/raspberrypi-swd.cfg -f target/rp2040.cfg -c "program pico_w/mqtt/mqtt_example.elf verify reset exit"
 openocd -f interface/raspberrypi-swd.cfg -f target/rp2040.cfg -c "program pico_w/freertos/ping/picow_freertos_ping_nosys.elf verify reset exit"
