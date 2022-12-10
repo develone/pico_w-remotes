@@ -65,6 +65,15 @@ typedef struct NTP_T_ {
 #define NTP_DELTA 2208988800 // seconds between 1 Jan 1900 and 1 Jan 1970
 #define NTP_TEST_TIME (30 * 1000)
 #define NTP_RESEND_TIME (10 * 1000)
+/*needed for rtc */
+datetime_t t;
+datetime_t alarm;
+datetime_t t_ntp;
+datetime_t *pt;
+datetime_t *palarm;
+datetime_t *pt_ntp;
+u8_t rtc_set_flag = 0;
+/*needed for rtc */
 /*needed for ntp*/
  
 
@@ -443,11 +452,38 @@ void vLaunch( void) {
     vTaskStartScheduler();
 }
 
+static
+set_rtc(datetime_t *pt, datetime_t *pt_ntp) {
+	if(rtc_set_flag==0) {
+		pt->year = pt_ntp->year;
+		pt->month = pt_ntp->month; 
+		pt->day = pt_ntp->day;
+		pt->dotw = 3;
+		pt->hour = pt_ntp->hour;
+		pt->min = pt_ntp->min;
+		pt->sec = pt_ntp->sec;
+		rtc_set_flag=1;
+
+	}
+	printf("%02d:%02d:%02d\n",pt->hour,pt->min,pt->sec);
+}
 /*needed for ntp*/
 // Called with results of operation
 static void ntp_result(NTP_T* state, int status, time_t *result) {
     if (status == 0 && result) {
         struct tm *utc = gmtime(result);
+		t_ntp.year = utc->tm_year + 1900;
+		t_ntp.month = utc->tm_mon + 1; 
+		t_ntp.day = utc->tm_mday;
+		t_ntp.hour = utc->tm_hour;
+		t_ntp.min = utc->tm_min;
+		t_ntp.sec = utc->tm_sec;
+		pt = &t;
+		pt_ntp = &t_ntp;
+		printf("0x%x 0x%x\n",pt,pt_ntp);
+		set_rtc(pt,pt_ntp);
+		
+		//printf("%02d:%02d:%02d\n",pt->hour,pt->min,pt->sec); 
         printf("got ntp response: %02d/%02d/%04d %02d:%02d:%02d\n", utc->tm_mday, utc->tm_mon + 1, utc->tm_year + 1900,
                utc->tm_hour, utc->tm_min, utc->tm_sec);
     }
@@ -583,34 +619,9 @@ void run_ntp_test(void) {
 int main() {
     stdio_init_all();
     printf("RTC Alarm!\n");
-
-    // Start on Wednesday 13th January 2021 11:20:00
-    datetime_t t = {
-        .year  = 2020,
-        .month = 01,
-        .day   = 13,
-        .dotw  = 3, // 0 is Sunday, so 3 is Wednesday
-        .hour  = 11,
-        .min   = 20,
-        .sec   = 00
-    };
-
     // Start the RTC
     rtc_init();
     rtc_set_datetime(&t);
-
-    // Alarm 5 seconds later
-    datetime_t alarm = {
-        .year  = 2020,
-        .month = 01,
-        .day   = 13,
-        .dotw  = 3, // 0 is Sunday, so 3 is Wednesday
-        .hour  = 11,
-        .min   = 22,
-        .sec   = 05
-    };
-
-    rtc_set_alarm(&alarm, &alarm_callback);
 
     printf("adding gpio support to the program\n");
 	unsigned char message[3] = {0xd3, 0x01, 0x00};
