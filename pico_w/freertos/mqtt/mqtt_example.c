@@ -73,6 +73,8 @@ datetime_t *pt;
 datetime_t *palarm;
 datetime_t *pt_ntp;
 u8_t rtc_set_flag = 0;
+char datetime_buf[256];
+char *datetime_str = &datetime_buf[0];
 /*needed for rtc */
 /*needed for ntp*/
  
@@ -452,20 +454,34 @@ void vLaunch( void) {
     vTaskStartScheduler();
 }
 
-static
-set_rtc(datetime_t *pt, datetime_t *pt_ntp) {
+
+void set_rtc(datetime_t *pt, datetime_t *pt_ntp,datetime_t *palarm) {
 	if(rtc_set_flag==0) {
 		pt->year = pt_ntp->year;
 		pt->month = pt_ntp->month; 
 		pt->day = pt_ntp->day;
-		pt->dotw = 3;
+		pt->dotw = 0;
 		pt->hour = pt_ntp->hour;
 		pt->min = pt_ntp->min;
 		pt->sec = pt_ntp->sec;
+		palarm->year = pt_ntp->year;
+		palarm->month = pt_ntp->month;
+		palarm->day = pt_ntp->day;
+		palarm->dotw = 0;
+		palarm->hour = pt_ntp->hour;
+		palarm->min = pt_ntp->min + 1;
+		palarm->sec = pt_ntp->sec;
 		rtc_set_flag=1;
+    	// Start the RTC
+    	rtc_init();
+    	rtc_set_datetime(&t);
+		sleep_us(64);
+		rtc_set_alarm(&alarm, &alarm_callback);
 
 	}
-	printf("%02d:%02d:%02d\n",pt->hour,pt->min,pt->sec);
+        rtc_get_datetime(&t);
+        datetime_to_str(datetime_str, sizeof(datetime_buf), &t);
+        printf("\r%s      ", datetime_str);
 }
 /*needed for ntp*/
 // Called with results of operation
@@ -480,8 +496,9 @@ static void ntp_result(NTP_T* state, int status, time_t *result) {
 		t_ntp.sec = utc->tm_sec;
 		pt = &t;
 		pt_ntp = &t_ntp;
-		printf("0x%x 0x%x\n",pt,pt_ntp);
-		set_rtc(pt,pt_ntp);
+		palarm = &alarm;
+		printf("0x%x 0x%x 0x%x\n",pt,pt_ntp,palarm);
+		set_rtc(pt,pt_ntp,palarm);
 		
 		//printf("%02d:%02d:%02d\n",pt->hour,pt->min,pt->sec); 
         printf("got ntp response: %02d/%02d/%04d %02d:%02d:%02d\n", utc->tm_mday, utc->tm_mon + 1, utc->tm_year + 1900,
@@ -619,9 +636,7 @@ void run_ntp_test(void) {
 int main() {
     stdio_init_all();
     printf("RTC Alarm!\n");
-    // Start the RTC
-    rtc_init();
-    rtc_set_datetime(&t);
+
 
     printf("adding gpio support to the program\n");
 	unsigned char message[3] = {0xd3, 0x01, 0x00};
