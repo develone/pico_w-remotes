@@ -1,3 +1,27 @@
+12/12/22
+git clone https://github.com/develone/pico_w-remotes.git -b dev
+Currently "mosquitto -c /etc/mosquitto/mosquitto.conf" needs to be done
+ before the pico_w power-up. 
+"MQTT client "remotex" connection cb: status 256" 
+This is how it should be 
+    MQTT client "remotex" connection cb: status 0
+    MQTT client "remotex" request cb: err 0
+    MQTT client "remotex" request cb: err 0
+ 
+"mosquitto_sub -t 'update/memo' -u 'testuser' -P 'password123'"
+Error: Connection refused. 
+
+mqtt_example_init(); is only done once in main_task.
+mqtt_example.h only proto-types 
+	void mqtt_example_init(void);
+./o-ocd.sh 
+./o-ocd.sh: line 2: openocd: command not found
+devel@pi4-35:~/pico_w-remotes/remote2 $ . ~/Ultibo_Projects/picoultibo.sh 
+/home/devel/ultibo/core:/home/devel/qemu-6.2.0-rpios/bin:/home/devel/local/openocd/bin:/home/devel/picotool/build/:/home/devel/.pyenv/plugins/pyenv-virtualenv/shims:/home/devel/.pyenv/shims:/home/devel/.pyenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/games:/usr/games
+modify .bashrc
+export PATH="$HOME/.pyenv/bin:$PATH" to 
+export PATH="$HOME/.pyenv/bin:$HOME/local/openocd/bin:$HOME/qemu-6.2.0-rpios/bin:$PATH"
+
 12/05/22
 This repo creates 6 pico_w/freertos/mqtt/picow_freertos_iperf_mqtt.elf & 
 pico_w/freertos/mqtt/picow_freertos_iperf_mqtt.uf2 in folders remote1 to remote6.
