@@ -314,6 +314,8 @@ void ntp_task(__unused void *params) {
 void mqtt_task(__unused void *params) {
     //bool on = false;
     printf("mqtt_task starts\n");
+mqtt_subscribe(mqtt_client,"update/memo", 2,pub_mqtt_request_cb_t,PUB_EXTRA_ARG);
+
     while (true) {
 #if 0 && configNUM_CORES > 1
         static int last_core_id;
