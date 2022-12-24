@@ -83,6 +83,7 @@ char *datetime_str = &datetime_buf[0];
 gpio will be an additional freertos task
 */
 #include "hardware/gpio.h"
+#include "hardware/watchdog.h"
 
 #include "lwip/netif.h"
 #include "lwip/ip4_addr.h"
@@ -117,8 +118,10 @@ int bits[10] = {
 #define BLINK_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
 #define GPIO_TASK_PRIORITY				( tskIDLE_PRIORITY + 3UL )
 #define MQTT_TASK_PRIORITY				( tskIDLE_PRIORITY + 4UL )
-/*needed for ntp*/
 #define NTP_TASK_PRIORITY				( tskIDLE_PRIORITY + 5UL )
+#define WATCHDOG_TASK_PRIORITY				( tskIDLE_PRIORITY + 6UL )
+/*needed for ntp*/
+
 /*needed for ntp*/
 #ifndef USE_LED
 #define USE_LED 1
@@ -138,8 +141,10 @@ u16_t mqtt_port = 1883;
 
 /*192.168.1.229 0xc0a801e5 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-27*/
 //#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a801e5))
+/*192.168.1.212 0xc0a801e5 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-27*/
+#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a801d4))
 /*192.168.1.157 0xc0a8019d LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-35*/
-#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a8019d))
+//#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a8019d))
 /*192.168.1.217 0xc0a801e5 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-36*/
 //#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a801d9))
 /*192.168.1.211 0xc0a801d3 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-38*/
@@ -162,7 +167,7 @@ static const struct mqtt_connect_client_info_t mqtt_client_info =
   CYW43_HOST_NAME,
   "testuser", /* user */
   "password123", /* pass */
-  100,  /* keep alive */
+  200,  /* keep alive */
   "topic_qos0", /* will_topic */
   NULL, /* will_msg */
   0,    /* will_qos */
@@ -311,6 +316,16 @@ void ntp_task(__unused void *params) {
 }
 /*needed for ntp*/
 
+void watchdog_task(__unused void *params) {
+    //bool on = false;
+    printf("watchdog_task starts\n");
+    watchdog_enable(10000, 1);
+    while (true) {
+	watchdog_update();
+       vTaskDelay(200);
+    }
+}
+
 void mqtt_task(__unused void *params) {
     //bool on = false;
     printf("mqtt_task starts\n");
@@ -416,6 +431,7 @@ void main_task(__unused void *params) {
         printf("IPADDR_LOOPBACK = 0x%x \n",IPADDR_LOOPBACK);
         mqtt_example_init();
     }
+    xTaskCreate(watchdog_task, "WatchdogThread", configMINIMAL_STACK_SIZE, NULL, WATCHDOG_TASK_PRIORITY, NULL);
 
     xTaskCreate(blink_task, "BlinkThread", configMINIMAL_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
 
@@ -424,7 +440,7 @@ void main_task(__unused void *params) {
 	xTaskCreate(mqtt_task, "MQTTThread", configMINIMAL_STACK_SIZE, NULL, MQTT_TASK_PRIORITY, NULL);
 
 	/*needed for ntp*/
-	xTaskCreate(ntp_task, "NTPThread", configMINIMAL_STACK_SIZE, NULL, MQTT_TASK_PRIORITY, NULL);
+	xTaskCreate(ntp_task, "NTPThread", configMINIMAL_STACK_SIZE, NULL, NTP_TASK_PRIORITY, NULL);
 	/*needed for ntp*/
 
 #if CLIENT_TEST
