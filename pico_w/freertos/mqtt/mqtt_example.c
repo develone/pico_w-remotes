@@ -87,7 +87,7 @@ gpio will be an additional freertos task
 #include "lwip/netif.h"
 #include "lwip/ip4_addr.h"
 #include "lwip/apps/lwiperf.h"
-//#include "pw_ssid.h"
+#include "pw_ssid.h"
 #include "FreeRTOS.h"
 #include "task.h"
 /*needed for GPIO from pico-examples/gpio/hello_7segment/hello_7segment.c
@@ -139,7 +139,7 @@ u16_t mqtt_port = 1883;
 /*192.168.1.229 0xc0a801e5 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-27*/
 //#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a801e5))
 /*192.168.1.157 0xc0a8019d LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-35*/
-#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a8019d))
+//#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a8019d))
 /*192.168.1.217 0xc0a801e5 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-36*/
 //#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a801d9))
 /*192.168.1.211 0xc0a801d3 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-38*/
@@ -162,7 +162,7 @@ static const struct mqtt_connect_client_info_t mqtt_client_info =
   CYW43_HOST_NAME,
   "testuser", /* user */
   "password123", /* pass */
-  100,  /* keep alive */
+  200,  /* keep alive */
   "topic_qos0", /* will_topic */
   NULL, /* will_msg */
   0,    /* will_qos */
