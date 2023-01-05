@@ -142,9 +142,9 @@ u16_t mqtt_port = 1883;
 /*192.168.1.229 0xc0a801e5 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-27*/
 //#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a801e5))
 /*192.168.1.212 0xc0a801e5 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-27*/
-#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a801d4))
+//#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a801d4))
 /*192.168.1.157 0xc0a8019d LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-35*/
-//#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a8019d))
+#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a8019d))
 /*192.168.1.217 0xc0a801e5 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-36*/
 //#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a801d9))
 /*192.168.1.211 0xc0a801d3 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-38*/
@@ -185,6 +185,7 @@ mqtt_incoming_data_cb(void *arg, const u8_t *data, u16_t len, u8_t flags)
 
   LWIP_PLATFORM_DIAG(("MQTT client \"%s\" data cb: len %d, flags %d\n", client_info->client_id,
           (int)len, (int)flags));
+  if (len==19) printf("%s \n",data);
 }
 
 static void
@@ -329,7 +330,7 @@ void watchdog_task(__unused void *params) {
 void mqtt_task(__unused void *params) {
     //bool on = false;
     printf("mqtt_task starts\n");
-mqtt_subscribe(mqtt_client,"update/memo", 2,pub_mqtt_request_cb_t,PUB_EXTRA_ARG);
+mqtt_subscribe(mqtt_client,"pub_time", 2,pub_mqtt_request_cb_t,PUB_EXTRA_ARG);
 
     while (true) {
 #if 0 && configNUM_CORES > 1
