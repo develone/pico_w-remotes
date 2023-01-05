@@ -6,8 +6,8 @@ add_executable(picow_freertos_iperf_mqtt
 		crc16.h 
         )
 target_compile_definitions(picow_freertos_iperf_mqtt PRIVATE
-        WIFI_SSID=\"${WIFI_SSID}\"
-        WIFI_PASSWORD=\"${WIFI_PASSWORD}\"
+        #WIFI_SSID=\"${WIFI_SSID}\"
+        #WIFI_PASSWORD=\"${WIFI_PASSWORD}\"
         )
 target_include_directories(picow_freertos_iperf_mqtt PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
