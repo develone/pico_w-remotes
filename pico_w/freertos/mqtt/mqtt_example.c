@@ -65,6 +65,8 @@ typedef struct NTP_T_ {
 #define NTP_DELTA 2208988800 // seconds between 1 Jan 1900 and 1 Jan 1970
 #define NTP_TEST_TIME (30 * 1000)
 #define NTP_RESEND_TIME (10 * 1000)
+
+
 /*needed for rtc */
 datetime_t t;
 datetime_t alarm;
@@ -154,6 +156,7 @@ u16_t mqtt_port = 1883;
 #endif
 #endif
 
+
 char PUB_PAYLOAD[] = "this is a message from pico_w ctrl 0       ";
 char PUB_PAYLOAD_SCR[] = "this is a message from pico_w ctrl 0       ";
 char PUB_EXTRA_ARG[] = "test";
@@ -161,7 +164,9 @@ u16_t payload_size;
 
 static ip_addr_t mqtt_ip LWIP_MQTT_EXAMPLE_IPADDR_INIT;
 static mqtt_client_t* mqtt_client;
-
+static mqtt_client_t* saved_mqtt_client = NULL;
+static u8_t mqtt_connected = 1;
+static u8_t check_mqtt_connected;
 static const struct mqtt_connect_client_info_t mqtt_client_info =
 {
   CYW43_HOST_NAME,
@@ -232,7 +237,8 @@ mqtt_example_init(void)
 #if LWIP_TCP
   mqtt_client = mqtt_client_new();
   printf("mqtt_client 0x%x &mqtt_client 0x%x \n", mqtt_client,&mqtt_client);	
-  
+  saved_mqtt_client = mqtt_client;
+  printf("saved_mqtt_client 0x%x mqtt_client 0x%x \n", saved_mqtt_client,mqtt_client);
   mqtt_set_inpub_callback(mqtt_client,
           mqtt_incoming_publish_cb,
           mqtt_incoming_data_cb,
@@ -240,7 +246,7 @@ mqtt_example_init(void)
   printf("mqtt_set_inpub_callback 0x%x\n",mqtt_set_inpub_callback);
   
 
-  mqtt_client_connect(mqtt_client,
+  mqtt_connected = mqtt_client_connect(mqtt_client,
           &mqtt_ip, mqtt_port,
           mqtt_connection_cb, LWIP_CONST_CAST(void*, &mqtt_client_info),
           &mqtt_client_info);
@@ -322,7 +328,9 @@ void watchdog_task(__unused void *params) {
     printf("watchdog_task starts\n");
     watchdog_enable(10000, 1);
     while (true) {
+	 
 	watchdog_update();
+ 
        vTaskDelay(200);
     }
 }
@@ -347,8 +355,18 @@ mqtt_subscribe(mqtt_client,"pub_time", 2,pub_mqtt_request_cb_t,PUB_EXTRA_ARG);
   strcat( PUB_PAYLOAD_SCR,CYW43_HOST_NAME);
   payload_size = sizeof(PUB_PAYLOAD_SCR) + 7;
   printf("%s  %d \n",PUB_PAYLOAD_SCR,sizeof(PUB_PAYLOAD_SCR));
-  mqtt_publish(mqtt_client,"update/memo",PUB_PAYLOAD_SCR,payload_size,2,0,pub_mqtt_request_cb_t,PUB_EXTRA_ARG);
+  check_mqtt_connected = mqtt_client_is_connected(saved_mqtt_client);
+  if (check_mqtt_connected == 0) {
+	mqtt_client_free(saved_mqtt_client);
+	mqtt_example_init();
+  } 	
+  /*
+  mqtt_client_is_connected 1 if connected to server, 0 otherwise 
+  */
+  printf("saved_mqtt_client 0x%x check_mqtt_connected %d \n", saved_mqtt_client,check_mqtt_connected);
 
+  mqtt_publish(mqtt_client,"update/memo",PUB_PAYLOAD_SCR,payload_size,2,0,pub_mqtt_request_cb_t,PUB_EXTRA_ARG);
+	
         vTaskDelay(25000);
     }
 }
@@ -430,7 +448,9 @@ void main_task(__unused void *params) {
         printf("mqtt_port = %d &mqtt_port 0x%x\n",mqtt_port,&mqtt_port);
         printf("mqtt_ip = 0x%x &mqtt_ip = 0x%x\n",mqtt_ip,&mqtt_ip);
         printf("IPADDR_LOOPBACK = 0x%x \n",IPADDR_LOOPBACK);
+	printf("saved_mqtt_client 0x%x %d \n", saved_mqtt_client,mqtt_connected);
         mqtt_example_init();
+	printf("saved_mqtt_client 0x%x %d \n", saved_mqtt_client,mqtt_connected);
     }
     xTaskCreate(watchdog_task, "WatchdogThread", configMINIMAL_STACK_SIZE, NULL, WATCHDOG_TASK_PRIORITY, NULL);
 
