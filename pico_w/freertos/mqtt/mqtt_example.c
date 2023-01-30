@@ -141,16 +141,15 @@ u16_t mqtt_port = 1883;
 #ifndef LWIP_MQTT_EXAMPLE_IPADDR_INIT
 #if LWIP_IPV4
 
-/*192.168.1.229 0xc0a801e5 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-27*/
-//#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a801e5))
-/*192.168.1.212 0xc0a801e5 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-27*/
+/* One of the defines below needs to uncommented to connect 
+to mosqquitto broker */
+/*192.168.1.212 0xc0a801d3 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-50*/
 //#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a801d4))
-/*192.168.1.157 0xc0a8019d LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-35*/
-#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a8019d))
-/*192.168.1.217 0xc0a801e5 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-36*/
-//#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a801d9))
-/*192.168.1.211 0xc0a801d3 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-38*/
+//*192.168.1.157 0xc0a8019d LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-20*/
+//#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a8019d))
+/*192.168.1.211 0xc0a801d3 LWIP_MQTT_EXAMPLE_IPADDR_INIT pi4-30*/
 //#define LWIP_MQTT_EXAMPLE_IPADDR_INIT = IPADDR4_INIT(PP_HTONL(0xc0a801d3))
+
 #else
 #define LWIP_MQTT_EXAMPLE_IPADDR_INIT
 #endif
@@ -167,6 +166,9 @@ static mqtt_client_t* mqtt_client;
 static mqtt_client_t* saved_mqtt_client = NULL;
 static u8_t mqtt_connected = 1;
 static u8_t check_mqtt_connected;
+static u8_t check_wifi_connected;
+static u8_t wifi_connected = 1;
+
 static const struct mqtt_connect_client_info_t mqtt_client_info =
 {
   CYW43_HOST_NAME,
@@ -325,11 +327,10 @@ void ntp_task(__unused void *params) {
 
 void watchdog_task(__unused void *params) {
     //bool on = false;
-    printf("watchdog_task starts\n");
-    watchdog_enable(10000, 1);
+
     while (true) {
 	 
-	watchdog_update();
+	if (wifi_connected == 0) watchdog_update();
  
        vTaskDelay(200);
     }
@@ -438,20 +439,26 @@ void main_task(__unused void *params) {
         printf("failed to initialise\n");
         return;
     }
-    cyw43_arch_enable_sta_mode();
-    printf("Connecting to WiFi...\n");
-    if (cyw43_arch_wifi_connect_timeout_ms(WIFI_SSID, WIFI_PASSWORD, CYW43_AUTH_WPA2_AES_PSK, 30000)) {
-        printf("failed to connect.\n");
-        exit(1);
-    } else {
-        printf("Connected.\n");
-        printf("mqtt_port = %d &mqtt_port 0x%x\n",mqtt_port,&mqtt_port);
-        printf("mqtt_ip = 0x%x &mqtt_ip = 0x%x\n",mqtt_ip,&mqtt_ip);
-        printf("IPADDR_LOOPBACK = 0x%x \n",IPADDR_LOOPBACK);
-	printf("saved_mqtt_client 0x%x %d \n", saved_mqtt_client,mqtt_connected);
-        mqtt_example_init();
-	printf("saved_mqtt_client 0x%x %d \n", saved_mqtt_client,mqtt_connected);
-    }
+	printf("watchdog_task starts\n");
+	watchdog_enable(10000, 1);
+	while (wifi_connected) {
+    	cyw43_arch_enable_sta_mode();
+    	printf("Connecting to WiFi...\n");
+   		if (cyw43_arch_wifi_connect_timeout_ms(WIFI_SSID, WIFI_PASSWORD, CYW43_AUTH_WPA2_AES_PSK, 30000)) {
+        	printf("failed to connect.\n");
+        	exit(1);
+    	} else {
+        	printf("Connected.\n");
+        	printf("mqtt_port = %d &mqtt_port 0x%x\n",mqtt_port,&mqtt_port);
+        	printf("mqtt_ip = 0x%x &mqtt_ip = 0x%x\n",mqtt_ip,&mqtt_ip);
+        	printf("IPADDR_LOOPBACK = 0x%x \n",IPADDR_LOOPBACK);
+			printf("saved_mqtt_client 0x%x %d \n", saved_mqtt_client,mqtt_connected);
+        	mqtt_example_init();
+			printf("saved_mqtt_client 0x%x %d \n", saved_mqtt_client,mqtt_connected);
+			wifi_connected=0;
+			printf("wifi_connected %d\n",wifi_connected);
+    	}
+	}
     xTaskCreate(watchdog_task, "WatchdogThread", configMINIMAL_STACK_SIZE, NULL, WATCHDOG_TASK_PRIORITY, NULL);
 
     xTaskCreate(blink_task, "BlinkThread", configMINIMAL_STACK_SIZE, NULL, BLINK_TASK_PRIORITY, NULL);
@@ -579,6 +586,7 @@ static int64_t ntp_failed_handler(alarm_id_t id, void *user_data)
     NTP_T* state = (NTP_T*)user_data;
     printf("ntp request failed\n");
     ntp_result(state, -1, NULL);
+	wifi_connected=1;
     return 0;
 }
 
